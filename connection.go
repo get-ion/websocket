@@ -152,12 +152,12 @@ type (
 
 		// OnDisconnect registers a callback which fires when this connection is closed by an error or manual
 		OnDisconnect(DisconnectFunc)
-		// OnStatusCode registers a callback which fires when this connection occurs an error
-		OnStatusCode(ErrorFunc)
+		// OnError registers a callback which fires when this connection occurs an error
+		OnError(ErrorFunc)
 		// FireStatusCode can be used to send a custom error message to the connection
 		//
-		// It does nothing more than firing the OnStatusCode listeners. It doesn't sends anything to the client.
-		FireStatusCode(errorMessage string)
+		// It does nothing more than firing the OnError listeners. It doesn't sends anything to the client.
+		FireOnError(errorMessage string)
 		// To defines where server should send a message
 		// returns an emitter to send messages
 		To(string) Emitter
@@ -336,7 +336,7 @@ func (c *connection) startReader() {
 		_, data, err := conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
-				c.FireStatusCode(err.Error())
+				c.FireOnError(err.Error())
 			}
 			break
 		} else {
@@ -421,11 +421,11 @@ func (c *connection) OnDisconnect(cb DisconnectFunc) {
 	c.onDisconnectListeners = append(c.onDisconnectListeners, cb)
 }
 
-func (c *connection) OnStatusCode(cb ErrorFunc) {
+func (c *connection) OnError(cb ErrorFunc) {
 	c.onErrorListeners = append(c.onErrorListeners, cb)
 }
 
-func (c *connection) FireStatusCode(errorMessage string) {
+func (c *connection) FireOnError(errorMessage string) {
 	for _, cb := range c.onErrorListeners {
 		cb(errorMessage)
 	}

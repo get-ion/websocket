@@ -3,7 +3,6 @@ package websocket
 import (
 	"sync"
 
-	"github.com/get-ion/ion"
 	"github.com/get-ion/ion/context"
 	"github.com/gorilla/websocket"
 )
@@ -160,7 +159,7 @@ func (s *Server) Handler() context.Handler {
 		conn, err := upgrader.Upgrade(ctx.ResponseWriter(), ctx.Request(), ctx.ResponseWriter().Header())
 		if err != nil {
 			ctx.Application().Logger().Warnf("websocket error: %v\n", err)
-			ctx.StatusCode(ion.StatusServiceUnavailable)
+			ctx.StatusCode(503) // Status ServiceUnavailable
 			return
 		}
 		s.handleConnection(ctx, conn)
